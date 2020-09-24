@@ -10,6 +10,6 @@ setup(
     packages=find_packages(exclude=["tests"]),
     license="GPL-3.0",
     platforms="any",
-    install_requires=[],
+    install_requires=["numpy", "pandas", "requests"],
     version=get_version(relative_to=__file__, write_to="ertapi/__version__.py"),
 )
