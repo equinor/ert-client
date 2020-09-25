@@ -93,7 +93,7 @@ class RequestData:
         return self.metadata["name"]
 
     def load_metadata(self):
-        if "ref_url" in self.metadata:
+        if self.metadata is not None and "ref_url" in self.metadata:
             self.req_metadata(self.metadata["ref_url"])
 
     def _get_data(self):
@@ -104,9 +104,9 @@ class RequestData:
         return None
 
     def req_metadata(self, ref_url):
-        _metadata = self._request_handler.request(ref_url)
+        _metadata = self._request_handler.request(ref_url=ref_url, json=True)
         if _metadata is not None:
-            self._metadata.update(_metadata.json())
+            self._metadata.update(_metadata)
 
     def req_data(self, ref_url):
         _data = self._request_handler.request(ref_url)
