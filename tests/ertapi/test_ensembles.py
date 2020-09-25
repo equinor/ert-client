@@ -3,18 +3,20 @@ import requests_mock
 from tests.ertapi.conftest import mock_urls
 
 from ertapi.ensemble import Ensembles
+from ertapi.client.request_handler import RequestHandler
 
 
 def test_ensembles_names(mock_urls):
     url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    ens = Ensembles(url)
-
+    request_handler = RequestHandler()
+    ens = Ensembles(request_handler=request_handler, metadata_dict=url)
     assert ens.names == ["default", "default_smoother_update"]
 
 
 def test_ensemble_api(mock_urls):
     url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    ens = Ensembles(url)
+    request_handler = RequestHandler()
+    ens = Ensembles(request_handler=request_handler, metadata_dict=url)
 
     assert ens[0].name == "default"
     assert ens[0].parameters == [
@@ -30,7 +32,8 @@ def test_ensemble_api(mock_urls):
 # data tests should be thought to be mocked differently
 def test_response_data_api(mock_urls):
     url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    ens = Ensembles(url)
+    request_handler = RequestHandler()
+    ens = Ensembles(request_handler=request_handler, metadata_dict=url)
     bpr_data = ens[0].parameter("BPR_138_PERSISTENCE").data
     print(ens[0].responses)
     assert ens[0].responses == [
@@ -45,7 +48,8 @@ def test_response_data_api(mock_urls):
 
 def test_test():
     url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    ensembles = Ensembles(url)
+    request_handler = RequestHandler()
+    ensembles = Ensembles(request_handler=request_handler, metadata_dict=url)
 
     assert ensembles is not None
     iter_count = 0

@@ -1,11 +1,11 @@
 import ertapi.ensemble
 import pandas as pd
-from ertapi.client.request_handler import RequestHandler
 
 
 class RequestData:
-    def __init__(self, metadata_dict=None):
+    def __init__(self, request_handler, metadata_dict=None):
         self._metadata = metadata_dict
+        self._request_handler = request_handler
         self._clear_data()
         self.load_metadata()
 
@@ -26,7 +26,9 @@ class RequestData:
         if not name in self._realizations:
             for node in self.metadata["realizations"]:
                 if name == node["name"]:
-                    self._realizations[name] = ertapi.ensemble.Realization(node)
+                    self._realizations[name] = ertapi.ensemble.Realization(
+                        self._request_handler, node
+                    )
                     break
         return self._realizations[name]
 
@@ -34,7 +36,9 @@ class RequestData:
         if not name in self._parameters:
             for node in self.metadata["parameters"]:
                 if name == node["key"]:
-                    self._parameters[name] = ertapi.ensemble.Parameter(node)
+                    self._parameters[name] = ertapi.ensemble.Parameter(
+                        self._request_handler, node
+                    )
                     break
         return self._parameters[name]
 
@@ -42,7 +46,9 @@ class RequestData:
         if not name in self._responses:
             for node in self.metadata["responses"]:
                 if name == node["name"]:
-                    self._responses[name] = ertapi.ensemble.Response(node)
+                    self._responses[name] = ertapi.ensemble.Response(
+                        self._request_handler, node
+                    )
                     break
         return self._responses[name]
 
@@ -50,7 +56,9 @@ class RequestData:
         if not name in self._observations:
             for node in self.metadata["observations"]:
                 if name == node["name"]:
-                    self._observations[name] = ertapi.ensemble.Observation(node)
+                    self._observations[name] = ertapi.ensemble.Observation(
+                        self._request_handler, node
+                    )
                     break
         return self._observations[name]
 
@@ -96,18 +104,18 @@ class RequestData:
         return None
 
     def req_metadata(self, ref_url):
-        _metadata = RequestHandler.request(ref_url)
+        _metadata = self._request_handler.request(ref_url)
         if _metadata is not None:
             self._metadata.update(_metadata.json())
 
     def req_data(self, ref_url):
-        _data = RequestHandler.request(ref_url)
+        _data = self._request_handler.request(ref_url)
         if _data is not None:
             _data = _data.content.decode()
             return pd.DataFrame([_data.split(",")])
 
     def req_alldata(self, ref_url):
-        _data = RequestHandler.request(ref_url)
+        _data = self._request_handler.request(ref_url)
         if _data is not None:
             _data = _data.content.decode()
             return pd.DataFrame([x.split(",") for x in _data.split("\n")])

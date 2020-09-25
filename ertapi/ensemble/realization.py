@@ -2,10 +2,10 @@ from ertapi.ensemble.request_data import RequestData
 
 
 class Realization(RequestData):
-    def __init__(self, metadata_dict):
+    def __init__(self, request_handler, metadata_dict):
         self._univariate_missfits = None
         self._summarized_missfits = None
-        super().__init__(metadata_dict)
+        super().__init__(request_handler=request_handler, metadata_dict=metadata_dict)
 
     def load_metadata(self):
         super().load_metadata()
