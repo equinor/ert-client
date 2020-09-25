@@ -1,3 +1,12 @@
+class DataContent:
+    def __init__(self, content):
+        self._content = content.encode()
+
+    @property
+    def content(self):
+        return self._content
+
+
 ensembles_response = {
     "http://127.0.0.1:5000/ensembles": {
         "ensembles": [
@@ -112,5 +121,38 @@ ensembles_response = {
         },
         "ref_url": "http://127.0.0.1:5000/ensembles/1/parameters/1",
     },
-    "http://127.0.0.1:5000/ensembles/1/parameters/1/data": "0.50, 0.38, 0.35",
+    "http://127.0.0.1:5000/ensembles/1/parameters/1/data": DataContent(
+        "0.50, 0.38, 0.35"
+    ),
+    "http://127.0.0.1:5000/ensembles/1/realizations/0": {
+        "name": 0,
+        "parameters": [
+            {
+                "data_url": "http://127.0.0.1:5000/data/33",
+                "name": "BPR_138_PERSISTENCE",
+            },
+            {
+                "data_url": "http://127.0.0.1:5000/data/58",
+                "name": "BPR_555_PERSISTENCE",
+            },
+            {
+                "data_url": "http://127.0.0.1:5000/data/83",
+                "name": "OP1_DIVERGENCE_SCALE",
+            },
+        ],
+        "responses": [
+            {
+                "data_url": "http://127.0.0.1:5000/data/284",
+                "name": "SNAKE_OIL_GPR_DIFF",
+            },
+            {
+                "data_url": "http://127.0.0.1:5000/data/310",
+                "name": "SNAKE_OIL_OPR_DIFF",
+            },
+            {
+                "data_url": "http://127.0.0.1:5000/data/336",
+                "name": "SNAKE_OIL_WPR_DIFF",
+            },
+        ],
+    },
 }
