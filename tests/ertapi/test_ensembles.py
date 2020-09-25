@@ -44,16 +44,3 @@ def test_response_data_api(mock_urls):
     # needs to be reworked as we want to get (3, 1)
     # issue is only how the mocked data is sent from snake_oil_data
     assert bpr_data.shape == (1, 3)
-
-
-def test_test():
-    url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    request_handler = RequestHandler()
-    ensembles = Ensembles(request_handler=request_handler, metadata_dict=url)
-
-    assert ensembles is not None
-    iter_count = 0
-    for _ in ensembles:
-        iter_count += 1
-
-    assert iter_count == len(ensembles)
