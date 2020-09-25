@@ -1,3 +1,4 @@
+from collections import namedtuple
 import ertapi.ensemble
 import pandas as pd
 
@@ -19,7 +20,13 @@ class RequestData:
         if field in self.metadata:
             if key is None:
                 return self.metadata[field]
-            return [node[key] for node in self.metadata[field]]
+            if not isinstance(key, list):
+                key = [key]
+            Record = namedtuple(field, key)
+            return Record(
+                *[[node[val] for node in self.metadata[field]] for val in key]
+            )
+
         return None
 
     def realization(self, name):
@@ -64,7 +71,7 @@ class RequestData:
 
     @property
     def parameters(self):
-        return self.get_node_fields("parameters", key="key")
+        return self.get_node_fields("parameters", key=["group", "key"])
 
     @property
     def responses(self):
@@ -112,10 +119,10 @@ class RequestData:
         _data = self._request_handler.request(ref_url)
         if _data is not None:
             _data = _data.content.decode()
-            return pd.DataFrame([_data.split(",")])
+            return pd.DataFrame([_data.split(",")]).astype(float)
 
     def req_alldata(self, ref_url):
         _data = self._request_handler.request(ref_url)
         if _data is not None:
             _data = _data.content.decode()
-            return pd.DataFrame([x.split(",") for x in _data.split("\n")])
+            return pd.DataFrame([x.split(",") for x in _data.split("\n")]).astype(float)

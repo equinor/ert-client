@@ -26,29 +26,8 @@ class Ensembles(RequestData):
 
     @property
     def names(self):
-        return self.get_node_fields("ensembles", key="name")
+        return self.get_node_fields("ensembles", key="name").name
 
     @property
     def times_created(self):
-        return self.get_node_fields("ensembles", key="time_created")
-
-    @property
-    def ensembles(self):
-        return self._ensembles
-
-
-if __name__ == "__main__":
-    url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    request_handler = RequestHandler()
-    ens = Ensembles(request_handler=request_handler, metadata_dict=url)
-    bpr_data = ens[0].parameter("BPR_138_PERSISTENCE").data
-    print(bpr_data.shape)
-
-    print(ens.times_created)
-    print(ens[0].responses)
-    print(ens[0].response("POLY_RES").observation("POLY_OBS").name)
-    print(ens[0].response("POLY_RES").observation("POLY_OBS").values.data)
-    print(ens[0].realization(0).response("POLY_RES").data)
-    print(ens[0].response("POLY_RES").realization(0).univariate_misfits("POLY_OBS"))
-    print(ens[0].response("POLY_RES").data)
-    print(ens[0].parameter("COEFF_A").data)
+        return self.get_node_fields("ensembles", key="time_created").time_created

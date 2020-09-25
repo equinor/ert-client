@@ -23,3 +23,7 @@ class Realization(RequestData):
     def summarized_misfits(self, obs_key):
         if obs_key in self._summarized_missfits:
             return self._summarized_missfits[obs_key]
+
+    @property
+    def parameters(self):
+        return self.get_node_fields("parameters", key=["name"])
