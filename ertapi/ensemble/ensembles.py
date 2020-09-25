@@ -9,6 +9,12 @@ class Ensembles(RequestData):
     def __getitem__(self, ens_id):
         return self._get_ensemble_by_id(ens_id)
 
+    def __iter___(self):
+        return self._ensembles
+
+    def __len__(self):
+        return len(self._ensembles)
+
     def _get_ensemble_by_id(self, ens_id):
         if not ens_id in self._ensembles:
             self._ensembles[ens_id] = Ensemble(self.metadata["ensembles"][ens_id])
