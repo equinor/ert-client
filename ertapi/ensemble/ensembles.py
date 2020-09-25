@@ -1,9 +1,10 @@
 from ertapi.ensemble import RequestData, Ensemble
+from ertapi.client.request_handler import RequestHandler
 
 
 class Ensembles(RequestData):
-    def __init__(self, metadata_dict):
-        super().__init__(metadata_dict)
+    def __init__(self, request_handler, metadata_dict):
+        super().__init__(request_handler=request_handler, metadata_dict=metadata_dict)
         self._ensembles = {}
 
     def __getitem__(self, ens_id):
@@ -17,7 +18,10 @@ class Ensembles(RequestData):
 
     def _get_ensemble_by_id(self, ens_id):
         if not ens_id in self._ensembles:
-            self._ensembles[ens_id] = Ensemble(self.metadata["ensembles"][ens_id])
+            self._ensembles[ens_id] = Ensemble(
+                request_handler=self._request_handler,
+                metadata_dict=self.metadata["ensembles"][ens_id],
+            )
         return self._ensembles[ens_id]
 
     @property
@@ -35,7 +39,8 @@ class Ensembles(RequestData):
 
 if __name__ == "__main__":
     url = {"ref_url": "http://127.0.0.1:5000/ensembles"}
-    ens = Ensembles(url)
+    request_handler = RequestHandler()
+    ens = Ensembles(request_handler=request_handler, metadata_dict=url)
     bpr_data = ens[0].parameter("BPR_138_PERSISTENCE").data
     print(bpr_data.shape)
 
