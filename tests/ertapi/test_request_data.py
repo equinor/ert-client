@@ -10,7 +10,7 @@ class RequestHandlerMock:
     def request(self, ref_url, json=False, stream=False):
         if ref_url in ensembles_response:
             return ensembles_response[ref_url]
-        assert True is False
+        raise Exception("ref_url {} is not supported from the mock".format(ref_url))
 
 
 def test_request_data_ensembles():
