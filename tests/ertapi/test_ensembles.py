@@ -40,7 +40,7 @@ def test_parameter_api(mock_requests_handler):
 
     param = Ensembles(request_handler=mock_requests_handler, metadata_dict=url)[
         0
-    ].parameter("BPR_138_PERSISTENCE")
+    ].parameters["BPR_138_PERSISTENCE"]
     assert (
         param.metadata["alldata_url"]
         == "http://127.0.0.1:5000/ensembles/1/parameters/1/data"
@@ -61,7 +61,7 @@ def test_realization_api(mock_requests_handler):
 
     assert ens_default.realizations.name == [0, 1, 2]
 
-    real_0 = ens_default.realization(0)
+    real_0 = ens_default.realizations[0]
     assert real_0.parameters.name == [
         "BPR_138_PERSISTENCE",
         "BPR_555_PERSISTENCE",

@@ -1,4 +1,4 @@
-from ertapi.ensemble.request_data import RequestData
+from ertapi.ensemble.request_data import RequestData, ParametersDict
 
 
 class Realization(RequestData):
@@ -26,4 +26,4 @@ class Realization(RequestData):
 
     @property
     def parameters(self):
-        return self.get_node_fields("parameters", key=["name"])
+        return ParametersDict("parameters", "name", self)

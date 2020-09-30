@@ -16,3 +16,7 @@ class Parameter(RequestData):
     @property
     def group(self):
         return self.metadata["group"]
+
+    @property
+    def key(self):
+        return self.metadata["key"]
