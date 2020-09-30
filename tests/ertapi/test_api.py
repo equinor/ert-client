@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union, Iterator
 
 import pytest
 
@@ -24,12 +24,57 @@ class Realization:
         self.responses = {}
 
 
+class _ResponseSet:
+    def __init__(self, realizations: "_RealizationSet"):
+        self._realizations = realizations
+
+    def __getitem__(self, item):
+        res = []
+        for realization in self._realizations:
+            res.append(realization.responses[item])
+        return res
+
+
+class _RealizationSet:
+    def __init__(self):
+        self._realizations = []
+
+    def add(self, realization: Realization):
+        self._realizations.append(realization)
+
+    def extend(self, realizations: List[Realization]):
+        for item in realizations:
+            self._realizations.append(item)
+
+    def __len__(self):
+        return len(self._realizations)
+
+    def __getitem__(self, item) -> Union[Realization, "_RealizationSet"]:
+        if isinstance(item, str):
+            for e in self._realizations:
+                if e.name == item:
+                    return e
+            raise KeyError
+        elif isinstance(item, slice):
+            res = _RealizationSet()
+            for e in self._realizations[item]:
+                res.add(e)
+            return res
+
+    def __iter__(self) -> Iterator[Realization]:
+        yield from self._realizations
+
+    @property
+    def responses(self):
+        return _ResponseSet(self)
+
+
 class Ensemble:
     def __init__(self, name, parent=None):
         self.name = name
         self.parent = parent
         self.parameters: List[ParameterDefinition] = []
-        self.realizations: List[Realization] = []
+        self.realizations: _RealizationSet = _RealizationSet()
 
 
 class Ensembles:
@@ -139,10 +184,29 @@ def test_realizations(ensembles: Ensembles):
     assert len(ens_1.realizations) == 3
 
     p1 = ens_1.parameters[0]
-    r2 = ens_1.realizations[1]
+    r2 = ens_1.realizations["2"]
     assert r2.name == "2"
     assert r2.parameter_samples[0].parameter_definition_ref == p1
     assert r2.parameter_samples[0].parameter_value == 0.63
 
     assert "FOPR" in r2.responses
     assert r2.responses["FOPR"] == [0.4, 0.5, 0.54, 0.3]
+
+
+def test_responses_across(ensembles: Ensembles):
+    ens_1 = ensembles["default"]
+
+    all_realizations = ens_1.realizations[:]
+    assert len(all_realizations) == 3
+    assert {r.name for r in all_realizations} == {"1", "2", "3"}
+
+    some_realizations = ens_1.realizations[::2]
+    assert len(some_realizations) == 2
+    assert {r.name for r in some_realizations} == {"1", "3"}
+
+    wopr_across = all_realizations.responses["WOPR"]
+    assert wopr_across == [
+        [0.7, 0.2, 0.1, 0.23],
+        [0.6, 0.4, 0.2, 0.23],
+        [0.65, 0.45, 0.25, 0.25],
+    ]
