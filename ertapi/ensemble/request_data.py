@@ -3,6 +3,28 @@ import ertapi.ensemble
 import pandas as pd
 
 
+class ParametersDict:
+    def __init__(self, field, key, parent):
+        self._field = field
+        self._parent = parent
+        self._key = key
+
+    def __getitem__(self, idx):
+        GenClass = {
+            "parameters": ertapi.ensemble.Parameter,
+            "observations": ertapi.ensemble.Observation,
+            "realizations": ertapi.ensemble.Realization,
+            "responses": ertapi.ensemble.Response,
+        }[self._field]
+        for node in self._parent.metadata[self._field]:
+            if idx == node[self._key]:
+                return GenClass(self._parent._request_handler, node)
+        return None
+
+    def __getattr__(self, attr):
+        return [node[attr] for node in self._parent.metadata[self._field]]
+
+
 class RequestData:
     def __init__(self, request_handler, metadata_dict=None):
         self._metadata = metadata_dict
@@ -29,61 +51,21 @@ class RequestData:
 
         return None
 
-    def realization(self, name):
-        if not name in self._realizations:
-            for node in self.metadata["realizations"]:
-                if name == node["name"]:
-                    self._realizations[name] = ertapi.ensemble.Realization(
-                        self._request_handler, node
-                    )
-                    break
-        return self._realizations[name]
-
-    def parameter(self, name):
-        if not name in self._parameters:
-            for node in self.metadata["parameters"]:
-                if name == node["key"]:
-                    self._parameters[name] = ertapi.ensemble.Parameter(
-                        self._request_handler, node
-                    )
-                    break
-        return self._parameters[name]
-
-    def response(self, name):
-        if not name in self._responses:
-            for node in self.metadata["responses"]:
-                if name == node["name"]:
-                    self._responses[name] = ertapi.ensemble.Response(
-                        self._request_handler, node
-                    )
-                    break
-        return self._responses[name]
-
-    def observation(self, name):
-        if not name in self._observations:
-            for node in self.metadata["observations"]:
-                if name == node["name"]:
-                    self._observations[name] = ertapi.ensemble.Observation(
-                        self._request_handler, node
-                    )
-                    break
-        return self._observations[name]
-
     @property
     def parameters(self):
-        return self.get_node_fields("parameters", key=["group", "key"])
+        return ParametersDict("parameters", "key", self)
 
     @property
     def responses(self):
-        return self.get_node_fields("responses", key="name")
+        return ParametersDict("responses", "name", self)
 
     @property
     def realizations(self):
-        return self.get_node_fields("realizations", key="name")
+        return ParametersDict("realizations", "name", self)
 
     @property
     def observations(self):
-        return self.get_node_fields("observations", key="name")
+        return ParametersDict("observations", "name", self)
 
     @property
     def metadata(self):
